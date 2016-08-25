@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import jinja2
+import webapp2
+import sys
+from random import randint
+
+reload(sys)
+sys.setdefaultencoding("utf8")
+
+template_dir = os.path.join(os.path.dirname(__file__), "html")
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=False)
+
+
+class BaseHandler(webapp2.RequestHandler):
+
+    def write(self, *a, **kw):
+        return self.response.out.write(*a, **kw)
+
+    def render_str(self, template, **params):
+        t = jinja_env.get_template(template)
+        return t.render(params)
+
+    def render(self, template, **kw):
+        return self.write(self.render_str(template, **kw))
+
+    def render_template(self, view_filename, params=None):
+        if not params:
+            params = {}
+        template = jinja_env.get_template(view_filename)
+        return self.response.out.write(template.render(params))
+
+
+croatia = {"country": "Hrvaška", "capital": "Zagreb", "url": "<img src='images/croatia.png'>"}
+slovenia = {"country": "Slovenija", "capital": "Ljubljana", "url": "<img src='images/slovenia.png'>"}
+italy = {"country": "Italija", "capital": "Rim", "url": "<img src='images/italy.png'>"}
+austria = {"country": "Avstrija", "capital": "Dunaj", "url": "<img src='images/austria.png'>"}
+hungary = {"country": "Madžarska", "capital": "Budimpešta", "url": "<img src='images/hungary.png'>"}
+
+select = [croatia, slovenia, italy, austria, hungary]
+selected_country = select[randint(0,4)]
+
+
+class MainHandler(BaseHandler):
+    def get(self):
+        global selected_country
+        selected_country = select[randint(0,4)]
+        return self.render_template("guess-the-city.html", params=selected_country)
+
+    def post(self):
+        guess = self.request.get("guess").capitalize()
+        if guess == selected_country["capital"]:
+            result = "PRAVILNO!!!"
+        else:
+            result = "Žal narobe."
+
+        self.write(result)
+
+
+app = webapp2.WSGIApplication([
+    webapp2.Route("/", MainHandler)
+], debug=True)

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}UGANI MESTO{% endblock title %}
+
+{% block body %}
+    <h1>UGANI MESTO DRŽAVE</h1>
+    <h2>Glavno mesto, ki ga iščemo, se nahaja v državi: {{ country }}</h2>
+    <p></p>
+    {{ url }}
+    <p></p>
+    <h3>Kako se mesto imenuje?</h3>
+    <form method="post" action="/">
+        <input name="guess">
+        <br>
+        <button type="submit">preveri odgovor</button>
+    </form>
+{% endblock body %}
