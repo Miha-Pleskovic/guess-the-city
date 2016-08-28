@@ -32,31 +32,32 @@ class BaseHandler(webapp2.RequestHandler):
         template = jinja_env.get_template(view_filename)
         return self.response.out.write(template.render(params))
 
+def data():
+    croatia = {"country": "Hrvaška", "capital": "Zagreb", "url": "<img src='images/croatia.png'>"}
+    slovenia = {"country": "Slovenija", "capital": "Ljubljana", "url": "<img src='images/slovenia.png'>"}
+    italy = {"country": "Italija", "capital": "Rim", "url": "<img src='images/italy.png'>"}
+    austria = {"country": "Avstrija", "capital": "Dunaj", "url": "<img src='images/austria.png'>"}
+    hungary = {"country": "Madžarska", "capital": "Budimpešta", "url": "<img src='images/hungary.png'>"}
 
-croatia = {"country": "Hrvaška", "capital": "Zagreb", "url": "<img src='images/croatia.png'>"}
-slovenia = {"country": "Slovenija", "capital": "Ljubljana", "url": "<img src='images/slovenia.png'>"}
-italy = {"country": "Italija", "capital": "Rim", "url": "<img src='images/italy.png'>"}
-austria = {"country": "Avstrija", "capital": "Dunaj", "url": "<img src='images/austria.png'>"}
-hungary = {"country": "Madžarska", "capital": "Budimpešta", "url": "<img src='images/hungary.png'>"}
-
-select = [croatia, slovenia, italy, austria, hungary]
-selected_country = select[randint(0,4)]
+    select = [croatia, slovenia, italy, austria, hungary]
+    return select[randint(0,4)]
 
 
 class MainHandler(BaseHandler):
     def get(self):
-        global selected_country
-        selected_country = select[randint(0,4)]
-        return self.render_template("guess-the-city.html", params=selected_country)
+        return self.render_template("guess-the-city.html", params=data())
 
     def post(self):
+        new_capital = data()
+        capital = self.request.get("capital")
         guess = self.request.get("guess").capitalize()
-        if guess == selected_country["capital"]:
+        if guess == capital:
             result = "PRAVILNO!!!"
         else:
             result = "Žal narobe."
 
-        self.write(result)
+        new_capital["result"] = result
+        return self.render_template("guess-the-city.html", params=new_capital)
 
 
 app = webapp2.WSGIApplication([

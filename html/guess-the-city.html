@@ -10,8 +10,13 @@
     <p></p>
     <h3>Kako se mesto imenuje?</h3>
     <form method="post" action="/">
+        <input type="hidden" value="{{ capital }}" name="capital">
         <input name="guess">
         <br>
         <button type="submit">preveri odgovor</button>
     </form>
+    <p></p>
+    {% if result %}
+        <p>{{ result }}</p>
+    {% endif %}
 {% endblock body %}
